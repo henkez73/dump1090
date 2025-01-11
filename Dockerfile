@@ -1,0 +1,7 @@
+FROM alpine:latest
+
+RUN apk update && apk upgrade && apk add --no-cache dump1090
+
+EXPOSE 8080 30001-30005 30104
+
+ENTRYPOINT ["dump1090","--interactive","--net"]
