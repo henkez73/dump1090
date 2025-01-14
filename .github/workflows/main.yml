@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
@@ -26,6 +26,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: henkez/dump1090
+          flavor: |
+            latest=true
+          tags: |
+            type=sha
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -36,5 +46,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
+          context: .
           push: true
-          tags: henkez/dump1090:test
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
